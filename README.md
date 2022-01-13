@@ -8,20 +8,35 @@
 먼저 google_play_scraper로 전체 4388개의 리뷰를 크롤링하고, 리뷰 내용이 10자 미만인 문서들은 제거하였다. 그리고 What do hotel customers complain about? Nan Hu (2019)  등 여러 연구에서 긍정적인 리뷰보다는 부정적인 리뷰에 유용한 정보를 더 많이 포함하고 있다는 것을 감안하여 5점 만점을 준 리뷰도 분석 대상에서 제외하였다.
 
 2.	Model Structure
- 
+
+![1](https://user-images.githubusercontent.com/92395248/149417102-dfdb3ab3-39d6-4396-b2a5-161a8b2fe9bd.PNG)
+
 2.1.	Variational form 
+ 
+![2](https://user-images.githubusercontent.com/92395248/149417106-7e65fbca-52bc-4bdf-ac6c-c44974465636.PNG)
  
 LDA for Variational Inference의 구조는 문서 내의 토픽분포를 결정하는 prior γ와 토픽 내의 단어 분포를 결정하는 prior λ, 특정 단어에 할당된 토픽 분포를 결정하는 φ가 variational parameter로 사용되고, ELBO를 최대화하는 방향으로 λ 를 고정하고 γ와 φ를 업데이트 한 후, 다시 γ와 φ를 고정하고 λ를 업데이트 하는 CAVI 알고리즘이 사용되었다. 
 
 3.	Measurement
+
+![3](https://user-images.githubusercontent.com/92395248/149417108-355c55a5-8c2d-4ebe-8113-b1a7022579c4.PNG)
+
 토픽의 개수는 perplexity와 coherence를 측정하여 Perplexity를 낮추고 coherence를 높이는 K로 정했다. 이 모델에서는 14개의 토픽에서 perplexity가 가장 낮아졌기 때문에 K를 14로 정했다.
 
 4.	Result
+
+![4](https://user-images.githubusercontent.com/92395248/149417109-feba858f-345e-4ab7-828f-43df39790ed4.PNG)
+
 14개의 토픽에서 가장 많이 등장한 단어는 app이었고, 앱의 snoring, good, use, free, version 순으로 등장했다. 실제로 내가 예상했던 유용한 정보라고 할 만한 단어는 free와 subscription정도였다. Free trial이 끝났을 때 무료 체험이 끝날 때 subscription 결제 방식에 대해 많은 사람이 지적했다는 것을 유추할 수 있었다.
 4.1.	Distance Map 
 
+![5](https://user-images.githubusercontent.com/92395248/149417111-08d1cf0c-d7bd-49f3-bffe-d1c6156927c9.PNG)
+
  14개의 토픽으로 분류된 각 원들은 각 토픽 간의 유사도(거리)를 나타낸다. 원이 겹쳐있으면 두 토픽이 그만큼 유사하다는 뜻이고, 많은 원이 겹쳐있을 경우 토픽의 개수를 다시 튜닝해야 한다. 실제로 처음 모델링했을 때는 11개의 토픽 중 9개가 겹쳐 있었고, 대부분이 비슷한 키워드들로 구성된 토픽이었다. 14개의 토픽으로 진행한 모델링은 겹쳐있는 부분도 적고, 포함하는 단어들도 달랐지만, 키워드들의 대부분은 앱 평가에 관한 것이었기 때문에 good, great 같은 유용하지 않은 단어들이 많았다. 
 4.2.	Contributive Topic Inference 
+
+![6](https://user-images.githubusercontent.com/92395248/149417098-9c840136-29a4-4ee3-b4dd-f7c0cba22c62.png)
+
  토픽 키워드만으로는 유용한 정보를 추출할 수 없었기 때문에, 역으로 토픽이 가장 많이 기여한 문서를 찾아 해당 텍스트를 직접 확인해 보았다. 
 ['initially', 'pleasantly', 'surprised', 'app', 'decided', 'buy', 'unfortunately', 'buying', app', 'broke', 'idea', 'change', 'settings', 'recorder', 'completely', 'messed', 'categorizes', really', 'quiet', 'snores', 'epic', 'ones', 'never', 'happened', 'filtering', 'snores', 'data', 'either', completely', 'exaggerated', 'super', 'high', 'scores', 'recordings', 'sound', 'quiet', downplayed', 'clear', 'snore', 'detected'].
 7번째 토픽에 가장 많이 기여한 리뷰의 내용을 보면, 처음 앱을 사용해보고 기쁜 마음으로 결제했지만, setting을 변경했더니 필터가 특정 소리를 지나치게 과장하거나 무시해버린다는 내용으로 유추된다. 이를 통해 setting 후 녹음의 민감도를 낮추거나, 필터자체의 조정이 필요하다는 방향성을 파악할 수 있었다. 
